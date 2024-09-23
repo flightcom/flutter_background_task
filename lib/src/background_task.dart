@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:ui';
 
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'callback_dispatcher.dart';
@@ -111,10 +112,12 @@ class BackgroundTask {
   /// `stream` provides a stream of location information.
   Stream<Location> get stream =>
       _bgEventChannel.receiveBroadcastStream().map((event) {
+        debugPrint('event: $event');
         final json = event as Map;
         final lat = json['lat'] as double?;
         final lng = json['lng'] as double?;
-        return (lat: lat, lng: lng);
+        final alt = json['lat'] as double?;
+        return (lat: lat, lng: lng, alt: alt);
       }).asBroadcastStream();
 
   /// `status` provides a stream of status events.
