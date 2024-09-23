@@ -22,6 +22,7 @@ void callbackDispatcher() {
           final data = (
             lat: json['lat'] as double?,
             lng: json['lng'] as double?,
+            alt: json['alt'] as double?,
           );
           callback?.call(data);
         }

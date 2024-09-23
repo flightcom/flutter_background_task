@@ -116,7 +116,7 @@ class BackgroundTask {
         final json = event as Map;
         final lat = json['lat'] as double?;
         final lng = json['lng'] as double?;
-        final alt = json['lat'] as double?;
+        final alt = json['alt'] as double?;
         return (lat: lat, lng: lng, alt: alt);
       }).asBroadcastStream();
 
