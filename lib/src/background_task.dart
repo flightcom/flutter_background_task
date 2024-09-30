@@ -117,7 +117,17 @@ class BackgroundTask {
         final lat = json['lat'] as double?;
         final lng = json['lng'] as double?;
         final alt = json['alt'] as double?;
-        return (lat: lat, lng: lng, alt: alt);
+        final hacc = json['hacc'] as double?;
+        final vacc = json['vacc'] as double?;
+        final speed = json['speed'] as double?;
+        return (
+          lat: lat,
+          lng: lng,
+          alt: alt,
+          hacc: hacc,
+          vacc: vacc,
+          speed: speed
+        );
       }).asBroadcastStream();
 
   /// `status` provides a stream of status events.
