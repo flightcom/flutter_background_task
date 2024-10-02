@@ -121,6 +121,7 @@ class BackgroundTask {
         final vacc = json['vacc'] as double?;
         final speed = json['speed'] as double?;
         final dir = json['dir'] as double?;
+        final time = json['time'] as double?;
         return (
           lat: lat,
           lng: lng,
@@ -128,7 +129,8 @@ class BackgroundTask {
           hacc: hacc,
           vacc: vacc,
           speed: speed,
-          dir: dir
+          dir: dir,
+          time: time
         );
       }).asBroadcastStream();
 
