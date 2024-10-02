@@ -120,13 +120,15 @@ class BackgroundTask {
         final hacc = json['hacc'] as double?;
         final vacc = json['vacc'] as double?;
         final speed = json['speed'] as double?;
+        final dir = json['dir'] as double?;
         return (
           lat: lat,
           lng: lng,
           alt: alt,
           hacc: hacc,
           vacc: vacc,
-          speed: speed
+          speed: speed,
+          dir: dir
         );
       }).asBroadcastStream();
 
