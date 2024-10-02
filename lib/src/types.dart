@@ -1,5 +1,12 @@
 /// `Location` is a type representing latitude and longitude.
-typedef Location = ({double? lat, double? lng});
+typedef Location = ({
+  double? lat,
+  double? lng,
+  double? alt,
+  double? hacc,
+  double? vacc,
+  double? speed
+});
 
 /// `StatusEvent` is a type representing a status event.
 typedef StatusEvent = ({StatusEventType status, String? message});
