@@ -217,13 +217,12 @@ public class BackgroundTaskPlugin: NSObject, FlutterPlugin, CLLocationManagerDel
             "hacc": hacc, 
             "vacc": vacc, 
             "speed": speed,
-            "dir": dir,
-            "time": time
+            "dir": dir
         ] as [String : Any?]
         
         BgEventStreamHandler.eventSink?(location)
         StatusEventStreamHandler.eventSink?(
-            StatusEventStreamHandler.StatusType.updated(message: "lat:\(lat ?? 0) lng:\(lng ?? 0) alt:\(alt ?? 0) hacc:\(hacc ?? 0) vacc:\(vacc ?? 0) speed:\(speed ?? 0) dir:\(dir ?? 0) time:\(time ?? 0)").value
+            StatusEventStreamHandler.StatusType.updated(message: "lat:\(lat ?? 0) lng:\(lng ?? 0) alt:\(alt ?? 0) hacc:\(hacc ?? 0) vacc:\(vacc ?? 0) speed:\(speed ?? 0) dir:\(dir ?? 0)").value
         )
         
         let callbackHandlerRawHandle = UserDefaultsRepository.instance.fetchCallbackHandlerRawHandle()
@@ -235,8 +234,7 @@ public class BackgroundTaskPlugin: NSObject, FlutterPlugin, CLLocationManagerDel
             "hacc": hacc,
             "vacc": vacc,
             "speed": speed,
-            "dir": dir,
-            "time": time
+            "dir": dir
         ] as [String : Any?]
         Self.dispatchChannel?.invokeMethod("background_handler", arguments: data)
     }
