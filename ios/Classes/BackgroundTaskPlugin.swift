@@ -209,7 +209,7 @@ public class BackgroundTaskPlugin: NSObject, FlutterPlugin, CLLocationManagerDel
         let speed: CLLocationSpeed? = locations.last?.speed
         let vacc: CLLocationAccuracy? = locations.last?.verticalAccuracy
         let dir: CLLocationDirection? = locations.last?.course
-        let time: Int? = locations.last?.timestamp
+        let time: Date? = locations.last?.timestamp
         let location: [String : Any?] = [
             "lat": lat, 
             "lng": lng, 

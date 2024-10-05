@@ -7,7 +7,7 @@ typedef Location = ({
   double? vacc,
   double? speed,
   double? dir,
-  double? time
+  DateTime? time
 });
 
 /// `StatusEvent` is a type representing a status event.

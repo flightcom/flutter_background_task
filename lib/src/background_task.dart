@@ -121,7 +121,7 @@ class BackgroundTask {
         final vacc = json['vacc'] as double?;
         final speed = json['speed'] as double?;
         final dir = json['dir'] as double?;
-        final time = json['time'] as double?;
+        final time = json['time'] as DateTime?;
         return (
           lat: lat,
           lng: lng,
