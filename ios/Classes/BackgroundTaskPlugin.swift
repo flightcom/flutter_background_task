@@ -95,6 +95,7 @@ public class BackgroundTaskPlugin: NSObject, FlutterPlugin, CLLocationManagerDel
 
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         if (call.method == "start_background_task") {
+            debugPrint("BTP --- start_background_task")
             let args = call.arguments as? Dictionary<String, Any>
             let distanceFilter = (args?["distanceFilter"] as? Double) ?? 0
             let pausesLocationUpdatesAutomatically = (args?["pausesLocationUpdatesAutomatically"] as? Bool) ?? false
@@ -154,6 +155,7 @@ public class BackgroundTaskPlugin: NSObject, FlutterPlugin, CLLocationManagerDel
         } else if (call.method == "is_running_background_task") {
             result(Self.isRunning)
         } else if (call.method == "set_background_handler") {
+            debugPrint("BTP --- set_background_handler")
             let args = call.arguments as? Dictionary<String, Any>
             Self.dispatcherRawHandle = args?["callbackDispatcherRawHandle"] as? Int
             Self.handlerRawHandle = args?["callbackHandlerRawHandle"] as? Int
@@ -194,6 +196,7 @@ public class BackgroundTaskPlugin: NSObject, FlutterPlugin, CLLocationManagerDel
     }
 
     public func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
+        debugPrint("BTP --- locationManager 1")
         let isEnabled: Bool = status == .authorizedAlways || status == .authorizedWhenInUse
         let message: String = isEnabled ? "enabled" : "disabled"
         StatusEventStreamHandler.eventSink?(
@@ -202,6 +205,7 @@ public class BackgroundTaskPlugin: NSObject, FlutterPlugin, CLLocationManagerDel
     }
 
     public func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        debugPrint("BTP --- locationManager 2")
         let lat: CLLocationDegrees? = locations.last?.coordinate.latitude
         let lng: CLLocationDegrees? = locations.last?.coordinate.longitude
         let alt: CLLocationDistance? = locations.last?.altitude
@@ -220,6 +224,8 @@ public class BackgroundTaskPlugin: NSObject, FlutterPlugin, CLLocationManagerDel
             "dir": dir
         ] as [String : Any?]
         
+        debugPrint("BTP --- locationManager 2 eventSink")
+
         BgEventStreamHandler.eventSink?(location)
         StatusEventStreamHandler.eventSink?(
             StatusEventStreamHandler.StatusType.updated(message: "lat:\(lat ?? 0) lng:\(lng ?? 0) alt:\(alt ?? 0) hacc:\(hacc ?? 0) vacc:\(vacc ?? 0) speed:\(speed ?? 0) dir:\(dir ?? 0)").value
