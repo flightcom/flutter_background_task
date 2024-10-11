@@ -95,7 +95,6 @@ public class BackgroundTaskPlugin: NSObject, FlutterPlugin, CLLocationManagerDel
 
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         if (call.method == "start_background_task") {
-            debugPrint("BTP --- start_background_task")
             let args = call.arguments as? Dictionary<String, Any>
             let distanceFilter = (args?["distanceFilter"] as? Double) ?? 0
             let pausesLocationUpdatesAutomatically = (args?["pausesLocationUpdatesAutomatically"] as? Bool) ?? false
@@ -124,7 +123,7 @@ public class BackgroundTaskPlugin: NSObject, FlutterPlugin, CLLocationManagerDel
             
             registerDispatchEngine()
           
-            let locationManager: CLLocationManager = CLLocationManager()
+            let locationManager = CLLocationManager()
             locationManager.allowsBackgroundLocationUpdates = true
             locationManager.showsBackgroundLocationIndicator = true
             locationManager.pausesLocationUpdatesAutomatically = pausesLocationUpdatesAutomatically
@@ -155,7 +154,6 @@ public class BackgroundTaskPlugin: NSObject, FlutterPlugin, CLLocationManagerDel
         } else if (call.method == "is_running_background_task") {
             result(Self.isRunning)
         } else if (call.method == "set_background_handler") {
-            debugPrint("BTP --- set_background_handler")
             let args = call.arguments as? Dictionary<String, Any>
             Self.dispatcherRawHandle = args?["callbackDispatcherRawHandle"] as? Int
             Self.handlerRawHandle = args?["callbackHandlerRawHandle"] as? Int
@@ -167,7 +165,7 @@ public class BackgroundTaskPlugin: NSObject, FlutterPlugin, CLLocationManagerDel
     public func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [AnyHashable : Any] = [:]) -> Bool {
         if (launchOptions[UIApplication.LaunchOptionsKey.location] != nil) {
             registerDispatchEngine()
-            let locationManager: CLLocationManager = CLLocationManager()
+            let locationManager = CLLocationManager()
             locationManager.allowsBackgroundLocationUpdates = true
             locationManager.showsBackgroundLocationIndicator = true
             let (distanceFilter, desiredAccuracy, pausesLocationUpdatesAutomatically) = UserDefaultsRepository.instance.fetch()
@@ -196,51 +194,27 @@ public class BackgroundTaskPlugin: NSObject, FlutterPlugin, CLLocationManagerDel
     }
 
     public func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
-        debugPrint("BTP --- locationManager 1")
-        let isEnabled: Bool = status == .authorizedAlways || status == .authorizedWhenInUse
-        let message: String = isEnabled ? "enabled" : "disabled"
+        let isEnabled = status == .authorizedAlways || status == .authorizedWhenInUse
         StatusEventStreamHandler.eventSink?(
-            StatusEventStreamHandler.StatusType.permission(message: message).value
+            StatusEventStreamHandler.StatusType.permission(message: "\(isEnabled ? "enabled" : "disabled")").value
         )
     }
 
     public func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        debugPrint("BTP --- locationManager 2")
-        let lat: CLLocationDegrees? = locations.last?.coordinate.latitude
-        let lng: CLLocationDegrees? = locations.last?.coordinate.longitude
-        let alt: CLLocationDistance? = locations.last?.altitude
-        let hacc: CLLocationAccuracy? = locations.last?.horizontalAccuracy
-        let speed: CLLocationSpeed? = locations.last?.speed
-        let vacc: CLLocationAccuracy? = locations.last?.verticalAccuracy
-        let dir: CLLocationDirection? = locations.last?.course
-        let time: Date? = locations.last?.timestamp
-        let location: [String : Any?] = [
-            "lat": lat, 
-            "lng": lng, 
-            "alt": alt, 
-            "hacc": hacc, 
-            "vacc": vacc, 
-            "speed": speed,
-            "dir": dir
-        ] as [String : Any?]
+        let lat = locations.last?.coordinate.latitude
+        let lng = locations.last?.coordinate.longitude
+        let location = ["lat": lat, "lng": lng] as [String : Double?]
         
-        debugPrint("BTP --- locationManager 2 eventSink")
-
         BgEventStreamHandler.eventSink?(location)
         StatusEventStreamHandler.eventSink?(
-            StatusEventStreamHandler.StatusType.updated(message: "lat:\(lat ?? 0) lng:\(lng ?? 0) alt:\(alt ?? 0) hacc:\(hacc ?? 0) vacc:\(vacc ?? 0) speed:\(speed ?? 0) dir:\(dir ?? 0)").value
+            StatusEventStreamHandler.StatusType.updated(message: "lat:\(lat ?? 0) lng:\(lng ?? 0)").value
         )
         
         let callbackHandlerRawHandle = UserDefaultsRepository.instance.fetchCallbackHandlerRawHandle()
         let data = [
             "callbackHandlerRawHandle": callbackHandlerRawHandle,
             "lat": lat,
-            "lng": lng,
-            "alt": alt,
-            "hacc": hacc,
-            "vacc": vacc,
-            "speed": speed,
-            "dir": dir
+            "lng": lng
         ] as [String : Any?]
         Self.dispatchChannel?.invokeMethod("background_handler", arguments: data)
     }
