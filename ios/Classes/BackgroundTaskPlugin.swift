@@ -124,7 +124,7 @@ public class BackgroundTaskPlugin: NSObject, FlutterPlugin, CLLocationManagerDel
             
             registerDispatchEngine()
           
-            let locationManager = CLLocationManager()
+            let locationManager: CLLocationManager = CLLocationManager()
             locationManager.allowsBackgroundLocationUpdates = true
             locationManager.showsBackgroundLocationIndicator = true
             locationManager.pausesLocationUpdatesAutomatically = pausesLocationUpdatesAutomatically
