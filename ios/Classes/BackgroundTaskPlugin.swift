@@ -157,7 +157,6 @@ public class BackgroundTaskPlugin: NSObject, FlutterPlugin, CLLocationManagerDel
             let args = call.arguments as? Dictionary<String, Any>
             Self.dispatcherRawHandle = args?["callbackDispatcherRawHandle"] as? Int
             Self.handlerRawHandle = args?["callbackHandlerRawHandle"] as? Int
-            debugPrint("registered \(String(describing: args))")
             result(true)
         }
     }
@@ -201,24 +200,28 @@ public class BackgroundTaskPlugin: NSObject, FlutterPlugin, CLLocationManagerDel
     }
 
     public func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        let lat = locations.last?.coordinate.latitude
-        let lng = locations.last?.coordinate.longitude
-        let alt = locations.last?.altitude
-        let hacc = locations.last?.horizontalAccuracy
-        let speed = locations.last?.speed
-        let vacc = locations.last?.verticalAccuracy
-        let location = [
-            "lat": lat, 
-            "lng": lng, 
-            "alt": alt, 
-            "hacc": hacc, 
-            "vacc": vacc, 
-            "speed": speed
-        ] as [String : Double?]
+        let lat: CLLocationDegrees? = locations.last?.coordinate.latitude
+        let lng: CLLocationDegrees? = locations.last?.coordinate.longitude
+        let alt: CLLocationDistance? = locations.last?.altitude
+        let hacc: CLLocationAccuracy? = locations.last?.horizontalAccuracy
+        let speed: CLLocationSpeed? = locations.last?.speed
+        let vacc: CLLocationAccuracy? = locations.last?.verticalAccuracy
+        let dir: CLLocationDirection? = locations.last?.course
+        let time: Date? = locations.last?.timestamp
+        let location: [String : Any?] = [
+            "lat": lat,
+            "lng": lng,
+            "alt": alt,
+            "hacc": hacc,
+            "vacc": vacc,
+            "speed": speed,
+            "dir": dir
+        ] as [String : Any?]
         
+
         BgEventStreamHandler.eventSink?(location)
         StatusEventStreamHandler.eventSink?(
-            StatusEventStreamHandler.StatusType.updated(message: "lat:\(lat ?? 0) lng:\(lng ?? 0) alt:\(alt ?? 0) hacc:\(hacc ?? 0) vacc:\(vacc ?? 0) speed:\(speed ?? 0)").value
+            StatusEventStreamHandler.StatusType.updated(message: "lat:\(lat ?? 0) lng:\(lng ?? 0) alt:\(alt ?? 0) hacc:\(hacc ?? 0) vacc:\(vacc ?? 0) speed:\(speed ?? 0) dir:\(dir ?? 0)").value
         )
         
         let callbackHandlerRawHandle = UserDefaultsRepository.instance.fetchCallbackHandlerRawHandle()
@@ -229,13 +232,13 @@ public class BackgroundTaskPlugin: NSObject, FlutterPlugin, CLLocationManagerDel
             "alt": alt,
             "hacc": hacc,
             "vacc": vacc,
-            "speed": speed
+            "speed": speed,
+            "dir": dir
         ] as [String : Any?]
         Self.dispatchChannel?.invokeMethod("background_handler", arguments: data)
     }
-    
+
     public func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
-        debugPrint("didFailWithError: \(error)")
         StatusEventStreamHandler.eventSink?(
             StatusEventStreamHandler.StatusType.error(message: error.localizedDescription).value
         )

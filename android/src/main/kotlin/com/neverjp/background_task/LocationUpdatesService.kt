@@ -169,15 +169,18 @@ class LocationUpdatesService: Service() {
         }.build()
 
     override fun onCreate() {
+        println("K - on Create")
         val googleAPIAvailability = GoogleApiAvailability.getInstance()
             .isGooglePlayServicesAvailable(applicationContext)
         isGoogleApiAvailable = googleAPIAvailability == ConnectionResult.SUCCESS
         Log.d(TAG,"isGoogleApiAvailable $isGoogleApiAvailable")
         if (isGoogleApiAvailable) {
+            println("K -- isGoogleApiAvailable")
             fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
             fusedLocationCallback = object : LocationCallback() {
                 override fun onLocationResult(locationResult: LocationResult) {
                     super.onLocationResult(locationResult)
+                    println("K --- onLocationResult")
                     val newLastLocation = locationResult.lastLocation
                     val lat = newLastLocation?.latitude
                     val lng = newLastLocation?.longitude
@@ -191,6 +194,7 @@ class LocationUpdatesService: Service() {
                             args["callbackHandlerRawHandle"] = it
                             args["lat"] = lat ?: 0
                             args["lng"] = lng ?: 0
+                            println("K ---- send result to background_handler")
                             methodChannel?.invokeMethod("background_handler", args)
                         }
                     }
