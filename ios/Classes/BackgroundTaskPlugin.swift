@@ -76,7 +76,6 @@ public class BackgroundTaskPlugin: NSObject, FlutterPlugin, CLLocationManagerDel
     }
 
     public static func register(with registrar: FlutterPluginRegistrar) {
-        debugPrint("---> iOS : register")
         let instance = BackgroundTaskPlugin()
         registrar.addApplicationDelegate(instance)
         
@@ -95,9 +94,7 @@ public class BackgroundTaskPlugin: NSObject, FlutterPlugin, CLLocationManagerDel
     }
 
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-        debugPrint("---> iOS : handle")
         if (call.method == "start_background_task") {
-            debugPrint("---> iOS : handle if 1")
             let args = call.arguments as? Dictionary<String, Any>
             let distanceFilter = (args?["distanceFilter"] as? Double) ?? 0
             let pausesLocationUpdatesAutomatically = (args?["pausesLocationUpdatesAutomatically"] as? Bool) ?? false
@@ -146,7 +143,6 @@ public class BackgroundTaskPlugin: NSObject, FlutterPlugin, CLLocationManagerDel
             )
             result(true)
         } else if (call.method == "stop_background_task") {
-            debugPrint("---> iOS : handle else stop_background_task")
             UserDefaultsRepository.instance.saveIsEnabledEvenIfKilled(false)
             Self.locationManager?.stopMonitoringSignificantLocationChanges()
             Self.locationManager?.stopUpdatingLocation()
@@ -156,22 +152,16 @@ public class BackgroundTaskPlugin: NSObject, FlutterPlugin, CLLocationManagerDel
             )
             result(true)
         } else if (call.method == "is_running_background_task") {
-            debugPrint("---> iOS : handle else is_running_background_task")
             result(Self.isRunning)
         } else if (call.method == "set_background_handler") {
-            debugPrint("---> iOS : handle else set_background_handler")
             let args = call.arguments as? Dictionary<String, Any>
             Self.dispatcherRawHandle = args?["callbackDispatcherRawHandle"] as? Int
             Self.handlerRawHandle = args?["callbackHandlerRawHandle"] as? Int
-            debugPrint("registered \(String(describing: args))")
             result(true)
-        } else {
-            debugPrint("---> iOS : handle else end")
         }
     }
     
     public func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [AnyHashable : Any] = [:]) -> Bool {
-        debugPrint("---> iOS : application")
         if (launchOptions[UIApplication.LaunchOptionsKey.location] != nil) {
             registerDispatchEngine()
             let locationManager = CLLocationManager()
@@ -191,21 +181,18 @@ public class BackgroundTaskPlugin: NSObject, FlutterPlugin, CLLocationManagerDel
     }
     
     public func applicationDidEnterBackground(_ application: UIApplication) {
-        debugPrint("---> iOS : applicationDidEnterBackground")
         if (isEnabledEvenIfKilled) {
             Self.locationManager?.startMonitoringSignificantLocationChanges()
         }
     }
     
     public func applicationWillTerminate(_ application: UIApplication) {
-        debugPrint("---> iOS : applicationWillTerminate")
         if (isEnabledEvenIfKilled) {
             Self.locationManager?.startMonitoringSignificantLocationChanges()
         }
     }
 
     public func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
-        debugPrint("---> iOS : locationManager 1")
         let isEnabled = status == .authorizedAlways || status == .authorizedWhenInUse
         StatusEventStreamHandler.eventSink?(
             StatusEventStreamHandler.StatusType.permission(message: "\(isEnabled ? "enabled" : "disabled")").value
@@ -213,7 +200,6 @@ public class BackgroundTaskPlugin: NSObject, FlutterPlugin, CLLocationManagerDel
     }
 
     public func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        debugPrint("---> iOS : locationManager 2")
         let lat: CLLocationDegrees? = locations.last?.coordinate.latitude
         let lng: CLLocationDegrees? = locations.last?.coordinate.longitude
         let alt: CLLocationDistance? = locations.last?.altitude
@@ -232,7 +218,6 @@ public class BackgroundTaskPlugin: NSObject, FlutterPlugin, CLLocationManagerDel
             "dir": dir
         ] as [String : Any?]
         
-        debugPrint("---> iOS : locationManager 2 eventSink")
 
         BgEventStreamHandler.eventSink?(location)
         StatusEventStreamHandler.eventSink?(
@@ -254,15 +239,12 @@ public class BackgroundTaskPlugin: NSObject, FlutterPlugin, CLLocationManagerDel
     }
 
     public func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
-        debugPrint("---> iOS : locationManager 3")
-        debugPrint("didFailWithError: \(error)")
         StatusEventStreamHandler.eventSink?(
             StatusEventStreamHandler.StatusType.error(message: error.localizedDescription).value
         )
     }
     
     private func registerDispatchEngine() {
-        debugPrint("---> iOS : registerDispatchEngine")
         if (Self.isRegisteredDispatchEngine) {
             return
         }
