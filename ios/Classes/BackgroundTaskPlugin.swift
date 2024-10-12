@@ -97,6 +97,7 @@ public class BackgroundTaskPlugin: NSObject, FlutterPlugin, CLLocationManagerDel
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         debugPrint("---> iOS : handle")
         if (call.method == "start_background_task") {
+            debugPrint("---> iOS : handle if 1")
             let args = call.arguments as? Dictionary<String, Any>
             let distanceFilter = (args?["distanceFilter"] as? Double) ?? 0
             let pausesLocationUpdatesAutomatically = (args?["pausesLocationUpdatesAutomatically"] as? Bool) ?? false
@@ -145,6 +146,7 @@ public class BackgroundTaskPlugin: NSObject, FlutterPlugin, CLLocationManagerDel
             )
             result(true)
         } else if (call.method == "stop_background_task") {
+            debugPrint("---> iOS : handle else stop_background_task")
             UserDefaultsRepository.instance.saveIsEnabledEvenIfKilled(false)
             Self.locationManager?.stopMonitoringSignificantLocationChanges()
             Self.locationManager?.stopUpdatingLocation()
@@ -154,13 +156,17 @@ public class BackgroundTaskPlugin: NSObject, FlutterPlugin, CLLocationManagerDel
             )
             result(true)
         } else if (call.method == "is_running_background_task") {
+            debugPrint("---> iOS : handle else is_running_background_task")
             result(Self.isRunning)
         } else if (call.method == "set_background_handler") {
+            debugPrint("---> iOS : handle else set_background_handler")
             let args = call.arguments as? Dictionary<String, Any>
             Self.dispatcherRawHandle = args?["callbackDispatcherRawHandle"] as? Int
             Self.handlerRawHandle = args?["callbackHandlerRawHandle"] as? Int
             debugPrint("registered \(String(describing: args))")
             result(true)
+        } else {
+            debugPrint("---> iOS : handle else end")
         }
     }
     
